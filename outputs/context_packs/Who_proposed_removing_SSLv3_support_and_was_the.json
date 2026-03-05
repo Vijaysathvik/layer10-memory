@@ -1,0 +1,82 @@
+{
+  "question": "Who proposed removing SSLv3 support and was there opposition?",
+  "snippets": [
+    {
+      "score": 0.921,
+      "claim_type": "DECIDED",
+      "claim_text": "RESOLVED: deprecate SSLv3 in 2.4, remove in 2.6 — vote +2/-0/abstain 0",
+      "excerpt": "RESOLVED: deprecate SSLv3 in 2.4, remove in 2.6. Vote: +2, -0, abstain 0.",
+      "message_id": "<004@httpd.apache.org>",
+      "timestamp": "2003-01-15T09:00:00"
+    },
+    {
+      "score": 0.876,
+      "claim_type": "SUPPORTS",
+      "claim_text": "Justin Erenkrantz supports deprecating SSLv3, casts +1 vote",
+      "excerpt": "I propose we remove SSLv3 support from mod_ssl entirely.\nIt is obsolete and CVE-2014-3566 (POODLE) demonstrates why.\nCasting my vote: +1",
+      "message_id": "<001@httpd.apache.org>",
+      "timestamp": "2003-01-14T10:22:00"
+    },
+    {
+      "score": 0.834,
+      "claim_type": "OPPOSES",
+      "claim_text": "William Rowe opposes immediate removal; proposes staged 2-release deprecation warning",
+      "excerpt": "-1 for now. Some enterprise customers still require SSLv3.\nWe should deprecate first with a 2-release warning, not remove.",
+      "message_id": "<003@httpd.apache.org>",
+      "timestamp": "2003-01-14T14:30:00"
+    },
+    {
+      "score": 0.801,
+      "claim_type": "SUPPORTS",
+      "claim_text": "Greg Stein supports deprecating SSLv3 (+1 vote)",
+      "excerpt": "+1 from me as well. Long overdue.",
+      "message_id": "<002@httpd.apache.org>",
+      "timestamp": "2003-01-14T12:05:00"
+    },
+    {
+      "score": 0.755,
+      "claim_type": "MENTIONS",
+      "claim_text": "Decision targets SSLv3 protocol (vulnerable to POODLE)",
+      "excerpt": "I propose we remove SSLv3 support from mod_ssl entirely.\nIt is obsolete and CVE-2014-3566 (POODLE) demonstrates why.",
+      "message_id": "<001@httpd.apache.org>",
+      "timestamp": "2003-01-14T10:22:00"
+    }
+  ],
+  "entities": [
+    { "id": "e_justin_1", "type": "Person", "name": "Justin Erenkrantz" },
+    { "id": "e_william_1", "type": "Person", "name": "William Rowe" },
+    { "id": "e_greg_1", "type": "Person", "name": "Greg Stein" },
+    { "id": "e_sslv3_dec", "type": "Decision", "name": "Deprecate SSLv3 in 2.4, remove in 2.6" },
+    { "id": "e_modssl", "type": "Component", "name": "mod_ssl" },
+    { "id": "e_sslv3_concept", "type": "Concept", "name": "SSLv3" }
+  ],
+  "citations": [
+    {
+      "number": 1,
+      "message_id": "<004@httpd.apache.org>",
+      "timestamp": "2003-01-15T09:00:00",
+      "subject": "Re: [VOTE] Remove SSLv3 support from mod_ssl"
+    },
+    {
+      "number": 2,
+      "message_id": "<001@httpd.apache.org>",
+      "timestamp": "2003-01-14T10:22:00",
+      "subject": "[VOTE] Remove SSLv3 support from mod_ssl"
+    },
+    {
+      "number": 3,
+      "message_id": "<003@httpd.apache.org>",
+      "timestamp": "2003-01-14T14:30:00",
+      "subject": "Re: [VOTE] Remove SSLv3 support from mod_ssl"
+    },
+    {
+      "number": 4,
+      "message_id": "<002@httpd.apache.org>",
+      "timestamp": "2003-01-14T12:05:00",
+      "subject": "Re: [VOTE] Remove SSLv3 support from mod_ssl"
+    }
+  ],
+  "ambiguities": [
+    "CONFLICT (resolved): William Rowe's -1 opposition [c3, valid_to=2003-01-15] was superseded by the amended RESOLVED [c4]. Resolution: b_wins. Both claims are stored; c3.valid_to is set."
+  ]
+}

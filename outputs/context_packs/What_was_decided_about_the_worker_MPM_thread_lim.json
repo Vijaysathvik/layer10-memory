@@ -1,0 +1,51 @@
+{
+  "question": "What was decided about the worker MPM thread limit?",
+  "snippets": [
+    {
+      "score": 0.944,
+      "claim_type": "DECIDED",
+      "claim_text": "Greg Stein proposes raising worker MPM ThreadsPerChild default from 25 to 64",
+      "excerpt": "Current default is 25. Modern hardware easily handles 64.\nThis would affect httpd-worker MPM component.\nVote: +1",
+      "message_id": "<007@httpd.apache.org>",
+      "timestamp": "2003-01-18T15:30:00"
+    },
+    {
+      "score": 0.897,
+      "claim_type": "SUPPORTS",
+      "claim_text": "Justin supports raising ThreadsPerChild to 64, citing BZ-12310 benchmark data",
+      "excerpt": "+1. Benchmark data supports this. See BZ-12310.",
+      "message_id": "<008@httpd.apache.org>",
+      "timestamp": "2003-01-18T16:00:00"
+    },
+    {
+      "score": 0.812,
+      "claim_type": "MENTIONS",
+      "claim_text": "ThreadsPerChild decision targets the worker MPM component",
+      "excerpt": "This would affect httpd-worker MPM component.",
+      "message_id": "<007@httpd.apache.org>",
+      "timestamp": "2003-01-18T15:30:00"
+    }
+  ],
+  "entities": [
+    { "id": "e_greg_1", "type": "Person", "name": "Greg Stein" },
+    { "id": "e_justin_1", "type": "Person", "name": "Justin Erenkrantz" },
+    { "id": "e_mpm_dec", "type": "Decision", "name": "Raise worker MPM ThreadsPerChild to 64" },
+    { "id": "e_worker_mpm", "type": "Component", "name": "worker MPM" },
+    { "id": "e_bz12310", "type": "Issue", "name": "BZ-12310" }
+  ],
+  "citations": [
+    {
+      "number": 1,
+      "message_id": "<007@httpd.apache.org>",
+      "timestamp": "2003-01-18T15:30:00",
+      "subject": "[VOTE] Worker MPM: raise default ThreadsPerChild to 64"
+    },
+    {
+      "number": 2,
+      "message_id": "<008@httpd.apache.org>",
+      "timestamp": "2003-01-18T16:00:00",
+      "subject": "Re: [VOTE] Worker MPM: raise default ThreadsPerChild to 64"
+    }
+  ],
+  "ambiguities": []
+}

@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Layer10 · Memory Graph</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<style>
+:root {
+  --ink: #05090f;
+  --ink2: #0a1020;
+  --ink3: #0f1a2e;
+  --panel: #0c1424;
+  --border: rgba(255,255,255,0.06);
+  --border2: rgba(255,255,255,0.12);
+  --gold: #e8b84b;
+  --gold2: #f5d07a;
+  --gold-dim: rgba(232,184,75,0.15);
+  --cyan: #4ecdc4;
+  --red: #ff6b6b;
+  --green: #51cf66;
+  --blue: #74c0fc;
+  --violet: #cc5de8;
+  --orange: #ff922b;
+  --text: #c9d1d9;
+  --text2: #8b9db3;
+  --text3: #4a5568;
+  --mono: 'IBM Plex Mono', monospace;
+  --sans: 'IBM Plex Sans', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; height: 100%; overflow: hidden; background: var(--ink); }
+
+body {
+  font-family: var(--mono);
+  display: grid;
+  grid-template-rows: 56px 1fr;
+  grid-template-columns: 1fr;
+}
+
+/* ═══════════════════════════════════════
+   HEADER
+═══════════════════════════════════════ */
+header {
+  background: var(--panel);
+  border-bottom: 1px solid var(--border2);
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  gap: 0;
+  position: relative;
+  z-index: 10;
+}
+
+.logo-mark {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-right: 32px;
+}
+
+.logo-hex {
+  width: 28px; height: 28px;
+  background: var(--gold);
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 600; color: var(--ink);
+  flex-shrink: 0;
+  animation: pulse-hex 3s ease-in-out infinite;
+}
+@keyframes pulse-hex {
+  0%,100% { box-shadow: 0 0 0 0 rgba(232,184,75,0); }
+  50% { box-shadow: 0 0 0 6px rgba(232,184,75,0.15); }
+}
+
+.logo-text { font-size: 13px; font-weight: 600; color: var(--gold); letter-spacing: 3px; text-transform: uppercase; }
+.logo-sub { font-size: 9px; color: var(--text3); letter-spacing: 2px; text-transform: uppercase; margin-top: 1px; }
+
+.header-divider { width: 1px; height: 32px; background: var(--border2); margin: 0 24px; }
+
+.header-stats {
+  display: flex;
+  gap: 24px;
+  flex: 1;
+}
+.hstat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.hstat-val { font-size: 18px; font-weight: 500; color: var(--gold); line-height: 1; }
+.hstat-label { font-size: 8px; color: var(--text3); letter-spacing: 2px; text-transform: uppercase; }
+
+.header-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.hbadge {
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 3px 8px;
+  border-radius: 2px;
+  border: 1px solid var(--border2);
+  color: var(--text3);
+}
+.hbadge.live { border-color: var(--green); color: var(--green); }
+.hbadge.live::before { content: '● '; font-size: 7px; }
+
+/* ═══════════════════════════════════════
+   MAIN LAYOUT
+═══════════════════════════════════════ */
+.workspace {
+  display: grid;
+  grid-template-columns: 240px 1fr 300px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ═══════════════════════════════════════
+   LEFT SIDEBAR
+═══════════════════════════════════════ */
+.sidebar {
+  background: var(--panel);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border2) transparent;
+}
+
+.sidebar::-webkit-scrollbar { width: 4px; }
+.sidebar::-webkit-scrollbar-track { background: transparent; }
+.sidebar::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+.sidebar-section {
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.section-label {
+  font-size: 8px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.search-wrap {
+  position: relative;
+  margin-bottom: 8px;
+}
+.search-wrap::before {
+  content: '⌕';
+  position: absolute;
+  left: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text3);
+  font-size: 14px;
+  pointer-events: none;
+}
+.search-input {
+  width: 100%;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--text);
+  font-size: 11px;
+  padding: 7px 10px 7px 28px;
+  outline: none;
+  font-family: var(--mono);
+  transition: border-color 0.2s;
+}
+.search-input:focus { border-color: var(--gold); background: rgba(232,184,75,0.04); }
+.search-input::placeholder { color: var(--text3); }
+
+.query-row { display: flex; gap: 6px; }
+.query-row .search-input { padding-left: 10px; }
+.ask-btn {
+  background: var(--gold);
+  color: var(--ink);
+  border: none;
+  border-radius: 3px;
+  padding: 7px 12px;
+  font-size: 10px;
+  font-weight: 600;
+  font-family: var(--mono);
+  cursor: pointer;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: background 0.15s, transform 0.1s;
+}
+.ask-btn:hover { background: var(--gold2); transform: translateY(-1px); }
+.ask-btn:active { transform: translateY(0); }
+
+.filter-list { display: flex; flex-direction: column; gap: 2px; }
+
+.filter-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 10px;
+  color: var(--text2);
+  transition: all 0.15s;
+  border: 1px solid transparent;
+}
+.filter-item:hover { background: rgba(255,255,255,0.04); color: var(--text); }
+.filter-item.on { background: rgba(255,255,255,0.05); color: var(--text); border-color: var(--border); }
+.filter-item.on .fi-dot { box-shadow: 0 0 6px currentColor; }
+
+.fi-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  transition: box-shadow 0.15s;
+}
+.fi-line {
+  width: 18px; height: 2px;
+  flex-shrink: 0;
+  border-radius: 1px;
+}
+.fi-count { margin-left: auto; font-size: 9px; color: var(--text3); }
+
+.conf-wrap { padding: 4px 0; }
+.conf-row { display: flex; justify-content: space-between; font-size: 10px; color: var(--text2); margin-bottom: 6px; }
+.conf-row span { color: var(--gold); font-weight: 500; }
+input[type=range] {
+  width: 100%;
+  -webkit-appearance: none;
+  height: 2px;
+  background: var(--border2);
+  border-radius: 1px;
+  outline: none;
+}
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 12px; height: 12px;
+  border-radius: 50%;
+  background: var(--gold);
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(232,184,75,0.5);
+}
+
+.toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 8px;
+  cursor: pointer;
+  border-radius: 3px;
+  font-size: 10px;
+  color: var(--text2);
+  margin-bottom: 2px;
+  transition: background 0.15s;
+  user-select: none;
+}
+.toggle-row:hover { background: rgba(255,255,255,0.04); }
+.toggle-pill {
+  width: 26px; height: 14px;
+  border-radius: 7px;
+  background: var(--border2);
+  position: relative;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+.toggle-pill::after {
+  content: '';
+  position: absolute;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  background: var(--text3);
+  top: 2px; left: 2px;
+  transition: all 0.2s;
+}
+.toggle-row.on .toggle-pill { background: rgba(232,184,75,0.3); }
+.toggle-row.on .toggle-pill::after { left: 14px; background: var(--gold); }
+.toggle-row.on { color: var(--text); }
+
+/* ═══════════════════════════════════════
+   GRAPH CANVAS
+═══════════════════════════════════════ */
+.canvas {
+  position: relative;
+  background: var(--ink);
+  overflow: hidden;
+}
+
+/* Subtle grid background */
+.canvas::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.015) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+}
+
+/* Vignette */
+.canvas::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center, transparent 40%, rgba(5,9,15,0.7) 100%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+#gsvg {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 2;
+}
+
+.zoom-controls {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  z-index: 10;
+}
+.zoom-btn {
+  width: 32px; height: 32px;
+  background: var(--panel);
+  border: 1px solid var(--border2);
+  border-radius: 3px;
+  color: var(--text2);
+  font-size: 16px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  font-family: var(--mono);
+  line-height: 1;
+}
+.zoom-btn:hover { background: var(--gold-dim); border-color: var(--gold); color: var(--gold); }
+
+.canvas-hint {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 9px;
+  color: var(--text3);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* Node legend */
+.graph-legend {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.gl-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 9px;
+  color: var(--text3);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+.gl-dot { width: 6px; height: 6px; border-radius: 50%; }
+
+/* Tooltip */
+.gtip {
+  position: absolute;
+  background: var(--panel);
+  border: 1px solid var(--border2);
+  border-radius: 4px;
+  padding: 10px 14px;
+  font-size: 10px;
+  font-family: var(--mono);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+  max-width: 220px;
+  z-index: 100;
+  color: var(--text2);
+  line-height: 1.7;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.5);
+}
+.gtip.vis { opacity: 1; }
+.gtip strong { color: var(--gold); display: block; margin-bottom: 2px; font-size: 11px; }
+
+/* ═══════════════════════════════════════
+   RIGHT PANEL
+═══════════════════════════════════════ */
+.evidence-panel {
+  background: var(--panel);
+  border-left: 1px solid var(--border);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border2) transparent;
+  display: flex;
+  flex-direction: column;
+}
+
+.evidence-panel::-webkit-scrollbar { width: 4px; }
+.evidence-panel::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+.ep-header {
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  background: var(--panel);
+  z-index: 5;
+}
+.ep-title { font-size: 8px; letter-spacing: 3px; text-transform: uppercase; color: var(--text3); margin-bottom: 4px; }
+.ep-name { font-size: 13px; color: var(--text); font-weight: 500; }
+
+.ep-body { padding: 16px; flex: 1; }
+
+.ep-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 40px 20px;
+  text-align: center;
+  gap: 12px;
+}
+.ep-empty-icon {
+  width: 48px; height: 48px;
+  border: 1px solid var(--border2);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text3);
+  font-size: 18px;
+}
+.ep-empty-text { font-size: 10px; color: var(--text3); line-height: 1.7; letter-spacing: 0.5px; }
+
+/* Cards */
+.ep-section-title {
+  font-size: 8px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--text3);
+  margin: 16px 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ep-section-title:first-child { margin-top: 0; }
+.ep-section-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+.claim-card {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 10px;
+  margin-bottom: 6px;
+  cursor: pointer;
+  transition: all 0.15s;
+  position: relative;
+  overflow: hidden;
+}
+.claim-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 2px;
+  background: var(--type-color, var(--text3));
+  transition: width 0.2s;
+}
+.claim-card:hover { border-color: var(--border2); background: rgba(255,255,255,0.04); }
+.claim-card:hover::before { width: 3px; }
+.claim-card.historical { opacity: 0.55; }
+
+.ct-badge {
+  font-size: 8px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 2px 6px;
+  border-radius: 2px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+.hist-tag {
+  font-size: 8px;
+  color: var(--red);
+  font-family: var(--mono);
+  margin-bottom: 3px;
+  letter-spacing: 0.5px;
+}
+.claim-text-body {
+  font-size: 11px;
+  color: var(--text);
+  line-height: 1.6;
+  margin-bottom: 6px;
+  font-family: var(--sans);
+  font-style: italic;
+}
+.excerpt-box {
+  background: rgba(0,0,0,0.3);
+  border-left: 2px solid var(--gold);
+  padding: 6px 10px;
+  border-radius: 0 3px 3px 0;
+  font-size: 10px;
+  color: var(--text2);
+  font-family: var(--mono);
+  margin-bottom: 6px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.6;
+}
+.card-meta {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.meta-pill {
+  font-size: 8px;
+  color: var(--text3);
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  padding: 2px 6px;
+  border-radius: 2px;
+  letter-spacing: 0.5px;
+}
+.conf-track {
+  height: 2px;
+  background: var(--border);
+  border-radius: 1px;
+  margin-top: 6px;
+  overflow: hidden;
+}
+.conf-fill { height: 100%; border-radius: 1px; transition: width 0.3s; }
+
+.entity-card {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 12px;
+  margin-bottom: 8px;
+}
+.ent-type-badge {
+  font-size: 8px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 2px;
+  display: inline-block;
+  margin-bottom: 7px;
+  font-weight: 500;
+}
+.ent-name { font-size: 15px; color: var(--text); font-weight: 500; margin-bottom: 4px; font-family: var(--sans); }
+.ent-meta { font-size: 9px; color: var(--text3); margin-top: 3px; line-height: 1.6; }
+
+.merge-card {
+  border: 1px solid rgba(232,184,75,0.3);
+  border-radius: 4px;
+  padding: 10px;
+  background: rgba(232,184,75,0.04);
+  margin-bottom: 6px;
+}
+.merge-entry {
+  font-size: 9px;
+  color: var(--text2);
+  padding: 4px 0;
+  border-bottom: 1px solid var(--border);
+  line-height: 1.7;
+}
+.merge-entry:last-child { border-bottom: none; }
+
+.conflict-card {
+  border: 1px solid rgba(255,107,107,0.3);
+  border-radius: 4px;
+  padding: 10px;
+  background: rgba(255,107,107,0.04);
+  margin-bottom: 6px;
+}
+.conflict-vs {
+  font-size: 8px;
+  color: var(--red);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  margin: 4px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.conflict-vs::before, .conflict-vs::after { content: ''; flex: 1; height: 1px; background: rgba(255,107,107,0.2); }
+.conflict-text { font-size: 10px; color: var(--text2); line-height: 1.6; font-family: var(--sans); }
+.resolution-tag {
+  font-size: 8px;
+  color: var(--green);
+  margin-top: 5px;
+  letter-spacing: 0.5px;
+}
+
+/* ═══════════════════════════════════════
+   SVG GRAPH ELEMENTS
+═══════════════════════════════════════ */
+.glink {
+  stroke-opacity: 0.5;
+  stroke-width: 1.2;
+  cursor: pointer;
+  transition: stroke-opacity 0.2s, stroke-width 0.2s;
+}
+.glink:hover { stroke-opacity: 1; stroke-width: 2; }
+.glink.dim { stroke-opacity: 0.05; }
+.glink.conflict-lk { stroke-width: 2; stroke-opacity: 0.8; stroke-dasharray: 5,3; }
+.glink.historical-lk { stroke-dasharray: 3,4; stroke-opacity: 0.3; }
+
+.gnode { cursor: pointer; }
+.gnode circle {
+  transition: r 0.2s, filter 0.2s;
+}
+.gnode:hover circle { filter: brightness(1.4); }
+.gnode.dim circle { opacity: 0.1; }
+.gnode.dim .node-lbl { opacity: 0.1; }
+.gnode.selected circle { stroke: var(--gold) !important; stroke-width: 2 !important; filter: drop-shadow(0 0 8px var(--gold)); }
+
+.node-lbl {
+  font-size: 9px;
+  font-family: var(--mono);
+  fill: var(--text2);
+  pointer-events: none;
+  letter-spacing: 0.3px;
+}
+
+/* Type colors */
+.ct-DECIDED   { --type-color: #51cf66; background: rgba(81,207,102,0.12); color: #51cf66; }
+.ct-SUPPORTS  { --type-color: #4ecdc4; background: rgba(78,205,196,0.12); color: #4ecdc4; }
+.ct-OPPOSES   { --type-color: #ff6b6b; background: rgba(255,107,107,0.12); color: #ff6b6b; }
+.ct-REVERSED  { --type-color: #ff4757; background: rgba(255,71,87,0.12); color: #ff4757; }
+.ct-ASSIGNED  { --type-color: #e8b84b; background: rgba(232,184,75,0.12); color: #e8b84b; }
+.ct-MENTIONS  { --type-color: #4a5568; background: rgba(74,85,104,0.15); color: #8b9db3; }
+.ct-AUTHORED  { --type-color: #cc5de8; background: rgba(204,93,232,0.12); color: #cc5de8; }
+.ct-DEPENDS_ON { --type-color: #ff922b; background: rgba(255,146,43,0.12); color: #ff922b; }
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.claim-card, .entity-card, .merge-card, .conflict-card {
+  animation: fadeIn 0.2s ease forwards;
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="logo-mark">
+    <div class="logo-hex">L</div>
+    <div>
+      <div class="logo-text">Layer10</div>
+      <div class="logo-sub">Memory Graph</div>
+    </div>
+  </div>
+  <div class="header-divider"></div>
+  <div class="header-stats">
+    <div class="hstat"><div class="hstat-val" id="hs-e">12</div><div class="hstat-label">Entities</div></div>
+    <div class="hstat"><div class="hstat-val" id="hs-c">12</div><div class="hstat-label">Claims</div></div>
+    <div class="hstat"><div class="hstat-val" id="hs-ev">8</div><div class="hstat-label">Evidence</div></div>
+    <div class="hstat"><div class="hstat-val" id="hs-m">2</div><div class="hstat-label">Merges</div></div>
+    <div class="hstat"><div class="hstat-val" id="hs-cf" style="color:var(--red)">1</div><div class="hstat-label">Conflicts</div></div>
+  </div>
+  <div class="header-right">
+    <div class="hbadge">Apache httpd-dev corpus</div>
+    <div class="hbadge">Schema v1.0.0</div>
+    <div class="hbadge live">Live</div>
+  </div>
+</header>
+
+<!-- WORKSPACE -->
+<div class="workspace">
+
+  <!-- LEFT SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-section">
+      <div class="section-label">Search</div>
+      <div class="search-wrap">
+        <input type="text" class="search-input" id="searchInput" placeholder="filter entities & claims…">
+      </div>
+      <div class="query-row">
+        <input type="text" class="search-input" id="queryInput" placeholder="ask a question…">
+        <button class="ask-btn" id="askBtn">Ask</button>
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="section-label">Entity Types</div>
+      <div class="filter-list" id="entityFilters"></div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="section-label">Claim Types</div>
+      <div class="filter-list" id="claimFilters"></div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="section-label">Confidence</div>
+      <div class="conf-wrap">
+        <div class="conf-row">Min threshold <span id="confVal">0.50</span></div>
+        <input type="range" id="confSlider" min="0" max="1" step="0.05" value="0.5">
+      </div>
+    </div>
+
+    <div class="sidebar-section">
+      <div class="section-label">Display</div>
+      <div class="toggle-row on" id="togHist">
+        <div class="toggle-pill"></div>
+        Historical claims
+      </div>
+      <div class="toggle-row on" id="togConf">
+        <div class="toggle-pill"></div>
+        Conflict highlights
+      </div>
+    </div>
+  </div>
+
+  <!-- GRAPH CANVAS -->
+  <div class="canvas" id="canvas">
+    <svg id="gsvg"></svg>
+
+    <div class="graph-legend" id="graphLegend"></div>
+
+    <div class="zoom-controls">
+      <button class="zoom-btn" id="zoomIn">+</button>
+      <button class="zoom-btn" id="zoomFit">⊡</button>
+      <button class="zoom-btn" id="zoomOut">−</button>
+    </div>
+
+    <div class="canvas-hint">Drag to pan · Scroll to zoom · Click to inspect</div>
+
+    <div class="gtip" id="gtip"></div>
+  </div>
+
+  <!-- EVIDENCE PANEL -->
+  <div class="evidence-panel">
+    <div class="ep-header">
+      <div class="ep-title">Inspector</div>
+      <div class="ep-name" id="epName">Select a node or edge</div>
+    </div>
+    <div class="ep-body" id="epBody">
+      <div class="ep-empty">
+        <div class="ep-empty-icon">◈</div>
+        <div class="ep-empty-text">Click any node or edge in the graph to inspect its evidence, claims, and provenance.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════
+const DATA = {
+  entities: [
+    {id:"e_j",  type:"Person",    name:"Justin Erenkrantz", confidence:1.0, meta:{emails:["jerenkrantz@apache.org","justin@erenkrantz.com"],org:"Apache Software Foundation"}},
+    {id:"e_g",  type:"Person",    name:"Greg Stein",         confidence:1.0, meta:{emails:["gstein@apache.org","gstein@google.com"],org:"Apache / Google"}},
+    {id:"e_w",  type:"Person",    name:"William Rowe",       confidence:1.0, meta:{emails:["wrowe@apache.org"],org:"Apache Software Foundation"}},
+    {id:"e_sd", type:"Decision",  name:"Deprecate SSLv3 in 2.4", confidence:0.9, meta:{vote_result:"passed",participants:["jerenkrantz@apache.org","gstein@apache.org","wrowe@apache.org"],thread:"[VOTE] Remove SSLv3 support from mod_ssl"}},
+    {id:"e_md", type:"Decision",  name:"Raise MPM ThreadsPerChild to 64", confidence:0.85, meta:{vote_result:"passed",participants:["gstein@google.com","jerenkrantz@apache.org"]}},
+    {id:"e_b1", type:"Issue",     name:"BZ-12301", confidence:0.95, meta:{external_id:"BZ-12301",status:"open",title:"mod_ssl segfault on renegotiation",url:"https://bz.apache.org/bugzilla/show_bug.cgi?id=12301"}},
+    {id:"e_b2", type:"Issue",     name:"BZ-12288", confidence:0.90, meta:{external_id:"BZ-12288",status:"open"}},
+    {id:"e_b3", type:"Issue",     name:"BZ-12310", confidence:0.85, meta:{external_id:"BZ-12310",status:"open",title:"MPM benchmark data"}},
+    {id:"e_ms", type:"Component", name:"mod_ssl",   confidence:0.95, meta:{project:"Apache httpd"}},
+    {id:"e_wm", type:"Component", name:"worker MPM",confidence:0.90, meta:{project:"Apache httpd"}},
+    {id:"e_hp", type:"Project",   name:"Apache httpd",confidence:1.0, meta:{repo:"https://github.com/apache/httpd"}},
+    {id:"e_sc", type:"Concept",   name:"SSLv3",     confidence:0.95, meta:{definition:"SSL Protocol v3.0 — deprecated, vulnerable to POODLE (CVE-2014-3566)"}},
+  ],
+  claims: [
+    {id:"c1", type:"SUPPORTS",   subject:"e_j",  object:"e_sd", text:"Justin Erenkrantz supports deprecating SSLv3, casts +1 vote",                           confidence:0.90, valid_from:"2003-01-14", valid_to:null, support:1},
+    {id:"c2", type:"SUPPORTS",   subject:"e_g",  object:"e_sd", text:"Greg Stein supports deprecating SSLv3 (+1 vote, 'long overdue')",                       confidence:0.88, valid_from:"2003-01-14", valid_to:null, support:1},
+    {id:"c3", type:"OPPOSES",    subject:"e_w",  object:"e_sd", text:"William Rowe opposes immediate removal — proposes staged 2-release deprecation",         confidence:0.85, valid_from:"2003-01-14", valid_to:"2003-01-15", support:1},
+    {id:"c4", type:"DECIDED",    subject:"e_j",  object:"e_sd", text:"RESOLVED: deprecate SSLv3 in 2.4, remove in 2.6 — vote +2/−0/abstain 0",              confidence:0.95, valid_from:"2003-01-15", valid_to:null, support:3},
+    {id:"c5", type:"ASSIGNED",   subject:"e_j",  object:"e_b1", text:"BZ-12301 (mod_ssl segfault on renegotiation) assigned to Justin Erenkrantz",             confidence:0.90, valid_from:"2003-01-16", valid_to:null, support:2},
+    {id:"c6", type:"MENTIONS",   subject:"e_j",  object:"e_b2", text:"Justin mentions BZ-12288 shares the same renegotiation code path as BZ-12301",           confidence:0.80, valid_from:"2003-01-17", valid_to:null, support:1},
+    {id:"c7", type:"SUPPORTS",   subject:"e_j",  object:"e_md", text:"Justin supports raising ThreadsPerChild to 64, citing BZ-12310 benchmarks",              confidence:0.85, valid_from:"2003-01-18", valid_to:null, support:1},
+    {id:"c8", type:"DECIDED",    subject:"e_g",  object:"e_md", text:"Greg proposes raising worker MPM ThreadsPerChild default from 25 to 64",                 confidence:0.88, valid_from:"2003-01-18", valid_to:null, support:2},
+    {id:"c9", type:"MENTIONS",   subject:"e_sd", object:"e_ms", text:"SSLv3 deprecation decision directly affects the mod_ssl component",                      confidence:0.90, valid_from:"2003-01-14", valid_to:null, support:2},
+    {id:"c10",type:"MENTIONS",   subject:"e_md", object:"e_wm", text:"ThreadsPerChild decision targets the worker MPM component",                               confidence:0.90, valid_from:"2003-01-18", valid_to:null, support:1},
+    {id:"c11",type:"DEPENDS_ON", subject:"e_b1", object:"e_b2", text:"BZ-12301 and BZ-12288 share renegotiation code path — likely same root cause",           confidence:0.75, valid_from:"2003-01-17", valid_to:null, support:1},
+    {id:"c12",type:"MENTIONS",   subject:"e_sd", object:"e_sc", text:"Decision targets SSLv3 protocol specifically (POODLE vulnerability)",                    confidence:0.95, valid_from:"2003-01-14", valid_to:null, support:1},
+  ],
+  evidence: [
+    {id:"ev1", claim_id:"c1",  msg_id:"<001@httpd.apache.org>", excerpt:"I propose we remove SSLv3 support from mod_ssl entirely.\nIt is obsolete and CVE-2014-3566 (POODLE) demonstrates why.\nCasting my vote: +1", ts:"2003-01-14T10:22:00", ver:"claude-haiku-4-5:1.0.0:abc123", cs:0, ce:130},
+    {id:"ev2", claim_id:"c2",  msg_id:"<002@httpd.apache.org>", excerpt:"+1 from me as well. Long overdue.", ts:"2003-01-14T12:05:00", ver:"claude-haiku-4-5:1.0.0:abc123", cs:62, ce:95},
+    {id:"ev3", claim_id:"c3",  msg_id:"<003@httpd.apache.org>", excerpt:"-1 for now. Some enterprise customers still require SSLv3.\nWe should deprecate first with a 2-release warning, not remove.", ts:"2003-01-14T14:30:00", ver:"claude-haiku-4-5:1.0.0:abc123", cs:0, ce:118},
+    {id:"ev4", claim_id:"c4",  msg_id:"<004@httpd.apache.org>", excerpt:"RESOLVED: deprecate SSLv3 in 2.4, remove in 2.6. Vote: +2, -0, abstain 0.", ts:"2003-01-15T09:00:00", ver:"claude-haiku-4-5:1.0.0:abc123", cs:59, ce:132},
+    {id:"ev5a",claim_id:"c5",  msg_id:"<005@httpd.apache.org>", excerpt:"Bug BZ-12301 (mod_ssl segfault on renegotiation) has been assigned to Justin.", ts:"2003-01-16T08:45:00", ver:"claude-haiku-4-5:1.0.0:abc123", cs:0, ce:75},
+    {id:"ev5b",claim_id:"c5",  msg_id:"<006@httpd.apache.org>", excerpt:"Confirmed. I'll look at BZ-12301 this week.\nAlso related: BZ-12288 (same renegotiation path).", ts:"2003-01-17T11:00:00", ver:"claude-haiku-4-5:1.0.0:abc123", cs:0, ce:93},
+    {id:"ev7", claim_id:"c7",  msg_id:"<008@httpd.apache.org>", excerpt:"+1. Benchmark data supports this. See BZ-12310.", ts:"2003-01-18T16:00:00", ver:"claude-haiku-4-5:1.0.0:abc123", cs:0, ce:47},
+    {id:"ev8", claim_id:"c8",  msg_id:"<007@httpd.apache.org>", excerpt:"Current default is 25. Modern hardware easily handles 64.\nThis would affect httpd-worker MPM component.\nVote: +1", ts:"2003-01-18T15:30:00", ver:"claude-haiku-4-5:1.0.0:abc123", cs:0, ce:110},
+  ],
+  merges: [
+    {source:"e_j_alt", target:"e_j", type:"Person", reason:"email_alias_cluster — justin@erenkrantz.com → jerenkrantz@apache.org (via canonical_overrides.json)", at:"2003-01-17", by:"pipeline_canonicalizer"},
+    {source:"e_g_alt", target:"e_g", type:"Person", reason:"username_name_cluster — gstein@google.com username 'gstein' matches gstein@apache.org, name similarity 1.0", at:"2003-01-18", by:"pipeline_canonicalizer"},
+  ],
+  conflicts: [
+    {id:"cf1", a:"c3", b:"c4", resolution:"b_wins", resolved:"2003-01-15", note:"William's -1 opposition superseded by Justin's amended RESOLVED. c3.valid_to set to 2003-01-15."},
+  ],
+};
+
+// ═══════════════════════════════════════════
+// CONSTANTS
+// ═══════════════════════════════════════════
+const NC = {Person:"#74c0fc",Project:"#51cf66",Component:"#cc5de8",Decision:"#e8b84b",Issue:"#ff6b6b",Concept:"#4ecdc4"};
+const LC = {DECIDED:"#51cf66",SUPPORTS:"#4ecdc4",OPPOSES:"#ff6b6b",REVERSED:"#ff4757",ASSIGNED:"#e8b84b",MENTIONS:"#4a6080",AUTHORED:"#cc5de8",DEPENDS_ON:"#ff922b"};
+
+const EVI = {};
+DATA.evidence.forEach(e => { (EVI[e.claim_id] = EVI[e.claim_id]||[]).push(e); });
+const CF_IDS = new Set(DATA.conflicts.flatMap(c=>[c.a,c.b]));
+
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+const S = {
+  et: new Set(Object.keys(NC)),
+  ct: new Set(Object.keys(LC)),
+  mc: 0.5,
+  hist: true,
+  cfhl: true,
+  sel: null,
+};
+
+// ═══════════════════════════════════════════
+// GRAPH SETUP
+// ═══════════════════════════════════════════
+let W, H, svg, gEl, linkG, nodeG, sim, zoomBehavior;
+
+window.addEventListener('load', () => setTimeout(init, 80));
+
+function init() {
+  const canvas = document.getElementById('canvas');
+  W = canvas.offsetWidth;
+  H = canvas.offsetHeight;
+
+  svg = d3.select('#gsvg');
+
+  zoomBehavior = d3.zoom()
+    .scaleExtent([0.1, 5])
+    .on('zoom', e => gEl.attr('transform', e.transform));
+  svg.call(zoomBehavior);
+  svg.on('dblclick.zoom', null);
+
+  // Arrowhead markers
+  const defs = svg.append('defs');
+  // Glow filter
+  const f = defs.append('filter').attr('id','glow');
+  f.append('feGaussianBlur').attr('stdDeviation','3').attr('result','blur');
+  const fM = f.append('feMerge');
+  fM.append('feMergeNode').attr('in','blur');
+  fM.append('feMergeNode').attr('in','SourceGraphic');
+
+  Object.entries(LC).forEach(([t,c]) => {
+    defs.append('marker')
+      .attr('id','arr-'+t).attr('viewBox','0 -4 8 8')
+      .attr('refX',20).attr('refY',0)
+      .attr('markerWidth',5).attr('markerHeight',5)
+      .attr('orient','auto')
+      .append('path').attr('d','M0,-4L8,0L0,4').attr('fill',c).attr('opacity',0.8);
+  });
+
+  gEl = svg.append('g');
+  linkG = gEl.append('g').attr('class','links');
+  nodeG = gEl.append('g').attr('class','nodes');
+
+  sim = d3.forceSimulation()
+    .force('link', d3.forceLink().id(d=>d.id).distance(d => {
+      if(d.type==='MENTIONS') return 100;
+      if(d.type==='DEPENDS_ON') return 90;
+      return 140;
+    }).strength(0.35))
+    .force('charge', d3.forceManyBody().strength(-420))
+    .force('center', d3.forceCenter(W/2, H/2))
+    .force('collision', d3.forceCollide(d => nodeR(d) + 18))
+    .on('tick', tick);
+
+  // Zoom buttons
+  document.getElementById('zoomIn').onclick = () => svg.transition().duration(300).call(zoomBehavior.scaleBy, 1.4);
+  document.getElementById('zoomOut').onclick = () => svg.transition().duration(300).call(zoomBehavior.scaleBy, 0.7);
+  document.getElementById('zoomFit').onclick = fitView;
+
+  buildFilters();
+  buildLegend();
+  renderGraph();
+
+  window.addEventListener('resize', () => {
+    W = canvas.offsetWidth; H = canvas.offsetHeight;
+    sim.force('center', d3.forceCenter(W/2, H/2)).alpha(0.3).restart();
+  });
+}
+
+// ═══════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════
+function getFiltered() {
+  const ns = DATA.entities.filter(e => S.et.has(e.type) && e.confidence >= S.mc);
+  const ids = new Set(ns.map(e=>e.id));
+  const ls = DATA.claims.filter(c =>
+    S.ct.has(c.type) && c.confidence >= S.mc &&
+    ids.has(c.subject) && ids.has(c.object) &&
+    (S.hist || c.valid_to === null)
+  );
+  return {ns, ls};
+}
+
+function renderGraph() {
+  const {ns, ls} = getFiltered();
+  const nodes = ns.map(n => ({...n}));
+  const links = ls.map(l => ({...l, source: l.subject, target: l.object}));
+
+  // Links
+  linkG.selectAll('line.glink')
+    .data(links, d=>d.id)
+    .join(
+      e => e.append('line')
+        .attr('class', d => {
+          let cls = 'glink';
+          if(CF_IDS.has(d.id) && S.cfhl) cls += ' conflict-lk';
+          if(d.valid_to !== null) cls += ' historical-lk';
+          return cls;
+        })
+        .attr('marker-end', d => `url(#arr-${d.type})`)
+        .style('stroke', d => CF_IDS.has(d.id) && S.cfhl ? '#ff6b6b' : (LC[d.type]||'#4a6080'))
+        .on('click', (ev, d) => { ev.stopPropagation(); showClaimPanel(d); })
+        .on('mouseover', (ev, d) => showLinkTip(ev, d))
+        .on('mouseout', hideTip),
+      u => u
+        .attr('class', d => {
+          let cls = 'glink';
+          if(CF_IDS.has(d.id) && S.cfhl) cls += ' conflict-lk';
+          if(d.valid_to !== null) cls += ' historical-lk';
+          return cls;
+        })
+        .style('stroke', d => CF_IDS.has(d.id) && S.cfhl ? '#ff6b6b' : (LC[d.type]||'#4a6080')),
+      x => x.remove()
+    );
+
+  // Nodes
+  nodeG.selectAll('g.gnode')
+    .data(nodes, d=>d.id)
+    .join(
+      e => {
+        const g2 = e.append('g').attr('class','gnode')
+          .call(d3.drag()
+            .on('start', (ev,d) => { if(!ev.active)sim.alphaTarget(0.3).restart(); d.fx=d.x; d.fy=d.y; })
+            .on('drag',  (ev,d) => { d.fx=ev.x; d.fy=ev.y; })
+            .on('end',   (ev,d) => { if(!ev.active)sim.alphaTarget(0); d.fx=null; d.fy=null; })
+          )
+          .on('click', (ev, d) => { ev.stopPropagation(); showEntityPanel(d); })
+          .on('mouseover', (ev, d) => showNodeTip(ev, d))
+          .on('mouseout', hideTip);
+
+        // Glow halo
+        g2.append('circle')
+          .attr('r', d => nodeR(d) + 6)
+          .attr('fill', d => NC[d.type]||'#64748b')
+          .attr('opacity', 0.08)
+          .attr('class','halo');
+
+        g2.append('circle')
+          .attr('r', d => nodeR(d))
+          .attr('fill', d => NC[d.type]||'#64748b')
+          .attr('fill-opacity', 0.9)
+          .attr('stroke', '#05090f')
+          .attr('stroke-width', 1.5);
+
+        // Icon letter
+        g2.append('text')
+          .attr('text-anchor','middle').attr('dominant-baseline','central')
+          .attr('font-size', d => nodeR(d) * 0.7)
+          .attr('font-family','IBM Plex Mono,monospace')
+          .attr('font-weight','600')
+          .attr('fill','#05090f')
+          .attr('pointer-events','none')
+          .text(d => d.type[0]);
+
+        g2.append('text')
+          .attr('class','node-lbl')
+          .attr('text-anchor','middle')
+          .attr('dy', d => nodeR(d) + 12)
+          .text(d => trunc(d.name, 14));
+
+        return g2;
+      },
+      u => {
+        u.select('circle:not(.halo)').attr('r', d => nodeR(d)).attr('fill', d => NC[d.type]||'#64748b');
+        u.select('.halo').attr('r', d => nodeR(d)+6).attr('fill', d => NC[d.type]||'#64748b');
+        u.select('.node-lbl').text(d => trunc(d.name, 14));
+        return u;
+      },
+      x => x.remove()
+    );
+
+  sim.nodes(nodes);
+  sim.force('link').links(links);
+  sim.alpha(0.7).restart();
+}
+
+function tick() {
+  linkG.selectAll('line.glink')
+    .attr('x1', d => (d.source.x||0))
+    .attr('y1', d => (d.source.y||0))
+    .attr('x2', d => (d.target.x||0))
+    .attr('y2', d => (d.target.y||0));
+  nodeG.selectAll('g.gnode')
+    .attr('transform', d => `translate(${d.x||0},${d.y||0})`);
+}
+
+const nodeR = d => ({Person:15,Decision:17,Project:14,Component:13,Issue:12,Concept:11}[d.type]||11) * (0.75 + d.confidence * 0.25);
+
+function fitView() {
+  const bounds = gEl.node().getBBox();
+  if(!bounds.width) return;
+  const pad = 60;
+  const scale = Math.min((W - pad*2)/bounds.width, (H - pad*2)/bounds.height, 1.5);
+  const tx = W/2 - scale*(bounds.x + bounds.width/2);
+  const ty = H/2 - scale*(bounds.y + bounds.height/2);
+  svg.transition().duration(500).call(zoomBehavior.transform, d3.zoomIdentity.translate(tx,ty).scale(scale));
+}
+
+// ═══════════════════════════════════════════
+// TOOLTIP
+// ═══════════════════════════════════════════
+const tip = document.getElementById('gtip');
+function showNodeTip(ev, d) {
+  const cc = DATA.claims.filter(c=>c.subject===d.id||c.object===d.id).length;
+  tip.innerHTML = `<strong>${d.name}</strong>${d.type} · ${cc} claim${cc!==1?'s':''}<br>confidence ${(d.confidence*100).toFixed(0)}%`;
+  positionTip(ev); tip.classList.add('vis');
+}
+function showLinkTip(ev, d) {
+  tip.innerHTML = `<strong>${d.type}</strong>${trunc(d.text, 55)}<br>conf ${(d.confidence*100).toFixed(0)}% · ×${d.support} evidence`;
+  positionTip(ev); tip.classList.add('vis');
+}
+function hideTip() { tip.classList.remove('vis'); }
+function positionTip(ev) {
+  const r = document.getElementById('canvas').getBoundingClientRect();
+  let x = ev.clientX - r.left + 14, y = ev.clientY - r.top - 12;
+  if(x + 230 > r.width) x -= 244;
+  if(y < 0) y = 8;
+  tip.style.left = x+'px'; tip.style.top = y+'px';
+}
+
+// ═══════════════════════════════════════════
+// PANELS
+// ═══════════════════════════════════════════
+function showEntityPanel(entity) {
+  S.sel = entity;
+  nodeG.selectAll('g.gnode').classed('selected', d => d.id === entity.id);
+  document.getElementById('epName').textContent = entity.name;
+
+  const claims = DATA.claims.filter(c => c.subject===entity.id || c.object===entity.id);
+  const merges = DATA.merges.filter(m => m.source===entity.id || m.target===entity.id);
+  const relConflicts = DATA.conflicts.filter(cf => claims.some(c=>c.id===cf.a||c.id===cf.b));
+
+  let h = '';
+
+  // Entity header
+  const color = NC[entity.type]||'#64748b';
+  h += `<div class="entity-card" style="--type-color:${color}">
+    <div class="ent-type-badge" style="background:${color}18;color:${color}">${entity.type}</div>
+    <div class="ent-name">${esc(entity.name)}</div>
+    <div class="ent-meta">id: <span style="color:var(--text2)">${entity.id}</span></div>
+    ${entity.meta.emails ? `<div class="ent-meta">✉ ${entity.meta.emails.join(' · ')}</div>` : ''}
+    ${entity.meta.org ? `<div class="ent-meta">org: ${entity.meta.org}</div>` : ''}
+    ${entity.meta.vote_result ? `<div class="ent-meta">vote: <span style="color:var(--green)">${entity.meta.vote_result}</span></div>` : ''}
+    ${entity.meta.external_id ? `<div class="ent-meta">${entity.meta.external_id} · status: ${entity.meta.status||'unknown'}</div>` : ''}
+    ${entity.meta.title ? `<div class="ent-meta">${entity.meta.title}</div>` : ''}
+    ${entity.meta.definition ? `<div class="ent-meta" style="font-family:var(--sans);font-style:italic;margin-top:4px">"${esc(entity.meta.definition)}"</div>` : ''}
+    <div class="conf-track" style="margin-top:8px"><div class="conf-fill" style="width:${entity.confidence*100}%;background:${color}"></div></div>
+  </div>`;
+
+  // Merge history
+  if(merges.length) {
+    h += `<div class="ep-section-title">Merge History</div>`;
+    h += `<div class="merge-card">`;
+    merges.forEach(m => {
+      h += `<div class="merge-entry">
+        <span style="color:var(--gold)">${m.source}</span> → <span style="color:var(--gold)">${m.target}</span><br>
+        reason: ${esc(m.reason)}<br>
+        merged: ${m.at} by ${m.by}
+      </div>`;
+    });
+    h += `</div>`;
+  }
+
+  // Conflicts
+  if(relConflicts.length) h += renderConflictsHtml(relConflicts);
+
+  // Claims
+  if(claims.length) {
+    h += `<div class="ep-section-title">Claims (${claims.length})</div>`;
+    claims.forEach(c => { h += claimCardHtml(c); });
+  }
+
+  document.getElementById('epBody').innerHTML = h;
+}
+
+function showClaimPanel(claim) {
+  S.sel = claim;
+  document.getElementById('epName').textContent = claim.type;
+  const evs = EVI[claim.id]||[];
+  const conflicts = DATA.conflicts.filter(cf=>cf.a===claim.id||cf.b===claim.id);
+
+  let h = `<div class="ep-section-title">Claim</div>`;
+  h += claimCardHtml(claim, true);
+
+  if(conflicts.length) h += renderConflictsHtml(conflicts);
+
+  if(evs.length) {
+    h += `<div class="ep-section-title">Evidence (${evs.length})</div>`;
+    evs.forEach(ev => {
+      h += `<div class="entity-card">
+        <div class="card-meta" style="margin-bottom:7px">
+          <div class="meta-pill" style="color:var(--gold);border-color:rgba(232,184,75,0.3)">${esc(ev.msg_id)}</div>
+          <div class="meta-pill">${ev.ts.slice(0,10)}</div>
+        </div>
+        <div class="excerpt-box">${esc(ev.excerpt)}</div>
+        <div class="card-meta">
+          <div class="meta-pill">offsets ${ev.cs}–${ev.ce}</div>
+          <div class="meta-pill">${ev.ver.split(':')[0]}</div>
+        </div>
+      </div>`;
+    });
+  }
+
+  document.getElementById('epBody').innerHTML = h;
+}
+
+function claimCardHtml(c, showExcerpt=false) {
+  const evs = EVI[c.id]||[];
+  const color = LC[c.type]||'#4a6080';
+  const isHist = c.valid_to !== null;
+  return `<div class="claim-card${isHist?' historical':''}" style="--type-color:${color}" onclick='showClaimPanel(${JSON.stringify(c).replace(/'/g,"&#39;")})'>
+    <div class="ct-badge ct-${c.type}" style="--type-color:${color}">${c.type}</div>
+    ${isHist ? `<div class="hist-tag">⏎ historical · valid until ${c.valid_to}</div>` : ''}
+    <div class="claim-text-body">"${esc(c.text)}"</div>
+    ${showExcerpt && evs[0] ? `<div class="excerpt-box">${esc(evs[0].excerpt.slice(0,220))}</div>` : ''}
+    <div class="card-meta">
+      <div class="meta-pill">×${c.support} evidence</div>
+      <div class="meta-pill">${c.valid_from}</div>
+      <div class="meta-pill">${(c.confidence*100).toFixed(0)}% conf</div>
+    </div>
+    <div class="conf-track"><div class="conf-fill" style="width:${c.confidence*100}%;background:${color}"></div></div>
+  </div>`;
+}
+
+function renderConflictsHtml(conflicts) {
+  let h = `<div class="ep-section-title">Conflicts</div>`;
+  conflicts.forEach(cf => {
+    const a = DATA.claims.find(c=>c.id===cf.a);
+    const b = DATA.claims.find(c=>c.id===cf.b);
+    h += `<div class="conflict-card">
+      <div class="conflict-text">"${esc(a?.text||cf.a)}"</div>
+      <div class="conflict-vs">conflict</div>
+      <div class="conflict-text">"${esc(b?.text||cf.b)}"</div>
+      ${cf.resolution ? `<div class="resolution-tag">✓ resolved: ${cf.resolution} · ${cf.resolved}</div>` : ''}
+      ${cf.note ? `<div class="ent-meta" style="margin-top:5px;font-family:var(--sans)">${esc(cf.note)}</div>` : ''}
+    </div>`;
+  });
+  return h;
+}
+
+// ═══════════════════════════════════════════
+// SEARCH & QUERY
+// ═══════════════════════════════════════════
+document.getElementById('searchInput').oninput = function() {
+  const q = this.value.toLowerCase();
+  nodeG.selectAll('g.gnode').classed('dim', d => q && !d.name.toLowerCase().includes(q));
+  linkG.selectAll('line.glink').classed('dim', d => q && !(d.text||'').toLowerCase().includes(q));
+};
+
+document.getElementById('askBtn').onclick = runQuery;
+document.getElementById('queryInput').onkeydown = e => { if(e.key==='Enter') runQuery(); };
+
+function runQuery() {
+  const q = document.getElementById('queryInput').value.trim();
+  if(!q) return;
+  const tokens = q.toLowerCase().split(/\s+/);
+  const scored = DATA.claims.map(c => ({
+    c,
+    score: tokens.filter(t => (c.text+' '+c.type).toLowerCase().includes(t)).length / tokens.length
+  })).filter(x => x.score > 0).sort((a,b) => b.score - a.score).slice(0, 6);
+
+  document.getElementById('epName').textContent = `Query: "${trunc(q, 22)}"`;
+
+  if(!scored.length) {
+    document.getElementById('epBody').innerHTML = `<div class="ep-empty"><div class="ep-empty-icon">∅</div><div class="ep-empty-text">No matching claims for<br>"${esc(q)}"</div></div>`;
+    return;
+  }
+
+  let h = `<div style="font-size:9px;color:var(--text3);margin-bottom:12px;padding:8px;background:rgba(232,184,75,0.06);border:1px solid rgba(232,184,75,0.15);border-radius:3px;line-height:1.7">"${esc(q)}"<br>${scored.length} result${scored.length!==1?'s':''} found</div>`;
+  scored.forEach(({c}) => { h += claimCardHtml(c, true); });
+  document.getElementById('epBody').innerHTML = h;
+}
+
+// ═══════════════════════════════════════════
+// FILTERS
+// ═══════════════════════════════════════════
+function buildFilters() {
+  const ec = {};
+  DATA.entities.forEach(e => ec[e.type]=(ec[e.type]||0)+1);
+
+  const ef = document.getElementById('entityFilters');
+  Object.entries(NC).forEach(([type, color]) => {
+    const d = document.createElement('div');
+    d.className = 'filter-item on';
+    d.innerHTML = `<div class="fi-dot" style="background:${color}"></div>${type}<span class="fi-count">${ec[type]||0}</span>`;
+    d.onclick = () => {
+      d.classList.toggle('on');
+      if(S.et.has(type)) S.et.delete(type); else S.et.add(type);
+      renderGraph();
+    };
+    ef.appendChild(d);
+  });
+
+  const cf = document.getElementById('claimFilters');
+  Object.entries(LC).forEach(([type, color]) => {
+    const d = document.createElement('div');
+    d.className = 'filter-item on';
+    d.innerHTML = `<div class="fi-line" style="background:${color}"></div>${type}`;
+    d.onclick = () => {
+      d.classList.toggle('on');
+      if(S.ct.has(type)) S.ct.delete(type); else S.ct.add(type);
+      renderGraph();
+    };
+    cf.appendChild(d);
+  });
+}
+
+document.getElementById('confSlider').oninput = function() {
+  S.mc = parseFloat(this.value);
+  document.getElementById('confVal').textContent = parseFloat(this.value).toFixed(2);
+  renderGraph();
+};
+
+document.getElementById('togHist').onclick = function() {
+  this.classList.toggle('on');
+  S.hist = this.classList.contains('on');
+  renderGraph();
+};
+
+document.getElementById('togConf').onclick = function() {
+  this.classList.toggle('on');
+  S.cfhl = this.classList.contains('on');
+  renderGraph();
+};
+
+// ═══════════════════════════════════════════
+// LEGEND
+// ═══════════════════════════════════════════
+function buildLegend() {
+  const lg = document.getElementById('graphLegend');
+  Object.entries(NC).forEach(([type, color]) => {
+    const d = document.createElement('div');
+    d.className = 'gl-item';
+    d.innerHTML = `<div class="gl-dot" style="background:${color};box-shadow:0 0 4px ${color}55"></div>${type}`;
+    lg.appendChild(d);
+  });
+}
+
+// ═══════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════
+const esc = s => (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const trunc = (s, n) => s && s.length > n ? s.slice(0, n)+'…' : (s||'');
+</script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+{
+  "question": "Which bugs were assigned to Justin Erenkrantz?",
+  "snippets": [
+    {
+      "score": 0.931,
+      "claim_type": "ASSIGNED",
+      "claim_text": "BZ-12301 (mod_ssl segfault on renegotiation) assigned to Justin Erenkrantz",
+      "excerpt": "Bug BZ-12301 (mod_ssl segfault on renegotiation) has been assigned to Justin.",
+      "message_id": "<005@httpd.apache.org>",
+      "timestamp": "2003-01-16T08:45:00"
+    },
+    {
+      "score": 0.855,
+      "claim_type": "ASSIGNED",
+      "claim_text": "BZ-12301 (mod_ssl segfault on renegotiation) assigned to Justin Erenkrantz",
+      "excerpt": "Confirmed. I'll look at BZ-12301 this week.\nAlso related: BZ-12288 (same renegotiation path).",
+      "message_id": "<006@httpd.apache.org>",
+      "timestamp": "2003-01-17T11:00:00"
+    },
+    {
+      "score": 0.734,
+      "claim_type": "MENTIONS",
+      "claim_text": "Justin mentions BZ-12288 as sharing the same renegotiation code path as BZ-12301",
+      "excerpt": "Also related: BZ-12288 (same renegotiation path).",
+      "message_id": "<006@httpd.apache.org>",
+      "timestamp": "2003-01-17T11:00:00"
+    }
+  ],
+  "entities": [
+    { "id": "e_justin_1", "type": "Person", "name": "Justin Erenkrantz" },
+    { "id": "e_bz12301", "type": "Issue", "name": "BZ-12301" },
+    { "id": "e_bz12288", "type": "Issue", "name": "BZ-12288" }
+  ],
+  "citations": [
+    {
+      "number": 1,
+      "message_id": "<005@httpd.apache.org>",
+      "timestamp": "2003-01-16T08:45:00",
+      "subject": "[BUG] BZ-12301 assigned to Justin"
+    },
+    {
+      "number": 2,
+      "message_id": "<006@httpd.apache.org>",
+      "timestamp": "2003-01-17T11:00:00",
+      "subject": "Re: [BUG] BZ-12301 assigned to Justin"
+    }
+  ],
+  "ambiguities": [
+    "Note: BZ-12288 is mentioned as related but has no formal ASSIGNED claim — Justin acknowledged it but assignment was not formally recorded."
+  ]
+}

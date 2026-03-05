@@ -1,0 +1,45 @@
+{
+  "question": "Were there any reversed or amended decisions?",
+  "snippets": [
+    {
+      "score": 0.889,
+      "claim_type": "OPPOSES",
+      "claim_text": "William Rowe opposes immediate removal; proposes staged 2-release deprecation warning",
+      "excerpt": "-1 for now. Some enterprise customers still require SSLv3.\nWe should deprecate first with a 2-release warning, not remove.",
+      "message_id": "<003@httpd.apache.org>",
+      "timestamp": "2003-01-14T14:30:00",
+      "_note": "HISTORICAL — valid_to=2003-01-15. This position was superseded."
+    },
+    {
+      "score": 0.867,
+      "claim_type": "DECIDED",
+      "claim_text": "RESOLVED: deprecate SSLv3 in 2.4, remove in 2.6 — vote +2/-0/abstain 0",
+      "excerpt": "William raises a fair point. Let's amend: deprecate in 2.4, remove in 2.6.\nRESOLVED: deprecate SSLv3 in 2.4, remove in 2.6. Vote: +2, -0, abstain 0.",
+      "message_id": "<004@httpd.apache.org>",
+      "timestamp": "2003-01-15T09:00:00",
+      "_note": "CURRENT — this is the amended decision that superseded the original removal proposal."
+    }
+  ],
+  "entities": [
+    { "id": "e_justin_1", "type": "Person", "name": "Justin Erenkrantz" },
+    { "id": "e_william_1", "type": "Person", "name": "William Rowe" },
+    { "id": "e_sslv3_dec", "type": "Decision", "name": "Deprecate SSLv3 in 2.4, remove in 2.6" }
+  ],
+  "citations": [
+    {
+      "number": 1,
+      "message_id": "<003@httpd.apache.org>",
+      "timestamp": "2003-01-14T14:30:00",
+      "subject": "Re: [VOTE] Remove SSLv3 support from mod_ssl"
+    },
+    {
+      "number": 2,
+      "message_id": "<004@httpd.apache.org>",
+      "timestamp": "2003-01-15T09:00:00",
+      "subject": "Re: [VOTE] Remove SSLv3 support from mod_ssl"
+    }
+  ],
+  "ambiguities": [
+    "The original proposal (immediate removal) was amended — not reversed — to a staged deprecation. The OPPOSES claim (c3) has valid_to set and is marked historical. The conflict (cf1) is resolved: b_wins. Both historical and current state are preserved in the graph."
+  ]
+}

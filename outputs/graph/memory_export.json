@@ -1,0 +1,405 @@
+{
+  "entities": [
+    {
+      "id": "e_justin_1",
+      "type": "Person",
+      "name": "Justin Erenkrantz",
+      "canonical_id": "e_justin_1",
+      "metadata_json": "{\"emails\": [\"jerenkrantz@apache.org\", \"justin@erenkrantz.com\"], \"org\": \"Apache\"}",
+      "confidence": 1.0,
+      "created_at": "2003-01-14T10:22:00",
+      "updated_at": "2003-01-17T11:00:00",
+      "deleted_at": null
+    },
+    {
+      "id": "e_greg_1",
+      "type": "Person",
+      "name": "Greg Stein",
+      "canonical_id": "e_greg_1",
+      "metadata_json": "{\"emails\": [\"gstein@apache.org\", \"gstein@google.com\"], \"org\": \"Google/Apache\"}",
+      "confidence": 1.0,
+      "created_at": "2003-01-14T12:05:00",
+      "updated_at": "2003-01-18T15:30:00",
+      "deleted_at": null
+    },
+    {
+      "id": "e_william_1",
+      "type": "Person",
+      "name": "William Rowe",
+      "canonical_id": "e_william_1",
+      "metadata_json": "{\"emails\": [\"wrowe@apache.org\"], \"org\": \"Apache\"}",
+      "confidence": 1.0,
+      "created_at": "2003-01-14T14:30:00",
+      "updated_at": "2003-01-14T14:30:00",
+      "deleted_at": null
+    },
+    {
+      "id": "e_sslv3_dec",
+      "type": "Decision",
+      "name": "Deprecate SSLv3 in 2.4, remove in 2.6",
+      "canonical_id": "e_sslv3_dec",
+      "metadata_json": "{\"vote_result\": \"passed\", \"participants\": [\"jerenkrantz@apache.org\", \"gstein@apache.org\", \"wrowe@apache.org\"], \"thread_subject\": \"[VOTE] Remove SSLv3 support from mod_ssl\"}",
+      "confidence": 0.9,
+      "created_at": "2003-01-15T09:00:00",
+      "updated_at": "2003-01-15T09:00:00",
+      "deleted_at": null
+    },
+    {
+      "id": "e_mpm_dec",
+      "type": "Decision",
+      "name": "Raise worker MPM ThreadsPerChild to 64",
+      "canonical_id": "e_mpm_dec",
+      "metadata_json": "{\"vote_result\": \"passed\", \"participants\": [\"gstein@google.com\", \"jerenkrantz@apache.org\"]}",
+      "confidence": 0.85,
+      "created_at": "2003-01-18T15:30:00",
+      "updated_at": "2003-01-18T15:30:00",
+      "deleted_at": null
+    },
+    {
+      "id": "e_bz12301",
+      "type": "Issue",
+      "name": "BZ-12301",
+      "canonical_id": "e_bz12301",
+      "metadata_json": "{\"external_id\": \"BZ-12301\", \"tracker_url\": \"https://bz.apache.org/bugzilla/show_bug.cgi?id=12301\", \"status\": \"open\", \"title\": \"mod_ssl segfault on renegotiation\"}",
+      "confidence": 0.95,
+      "created_at": "2003-01-16T08:45:00",
+      "updated_at": "2003-01-17T11:00:00",
+      "deleted_at": null
+    },
+    {
+      "id": "e_bz12288",
+      "type": "Issue",
+      "name": "BZ-12288",
+      "canonical_id": "e_bz12288",
+      "metadata_json": "{\"external_id\": \"BZ-12288\", \"status\": \"open\"}",
+      "confidence": 0.9,
+      "created_at": "2003-01-17T11:00:00",
+      "updated_at": "2003-01-17T11:00:00",
+      "deleted_at": null
+    },
+    {
+      "id": "e_bz12310",
+      "type": "Issue",
+      "name": "BZ-12310",
+      "canonical_id": "e_bz12310",
+      "metadata_json": "{\"external_id\": \"BZ-12310\", \"status\": \"open\"}",
+      "confidence": 0.85,
+      "created_at": "2003-01-18T16:00:00",
+      "updated_at": "2003-01-18T16:00:00",
+      "deleted_at": null
+    },
+    {
+      "id": "e_modssl",
+      "type": "Component",
+      "name": "mod_ssl",
+      "canonical_id": "e_modssl",
+      "metadata_json": "{}",
+      "confidence": 0.95,
+      "created_at": "2003-01-14T10:22:00",
+      "updated_at": "2003-01-14T10:22:00",
+      "deleted_at": null
+    },
+    {
+      "id": "e_worker_mpm",
+      "type": "Component",
+      "name": "worker MPM",
+      "canonical_id": "e_worker_mpm",
+      "metadata_json": "{}",
+      "confidence": 0.9,
+      "created_at": "2003-01-18T15:30:00",
+      "updated_at": "2003-01-18T15:30:00",
+      "deleted_at": null
+    },
+    {
+      "id": "e_httpd",
+      "type": "Project",
+      "name": "Apache httpd",
+      "canonical_id": "e_httpd",
+      "metadata_json": "{\"repo_url\": \"https://github.com/apache/httpd\"}",
+      "confidence": 1.0,
+      "created_at": "2003-01-14T10:22:00",
+      "updated_at": "2003-01-14T10:22:00",
+      "deleted_at": null
+    },
+    {
+      "id": "e_sslv3_concept",
+      "type": "Concept",
+      "name": "SSLv3",
+      "canonical_id": "e_sslv3_concept",
+      "metadata_json": "{\"definition\": \"Deprecated SSL protocol version 3.0, vulnerable to POODLE (CVE-2014-3566)\"}",
+      "confidence": 0.95,
+      "created_at": "2003-01-14T10:22:00",
+      "updated_at": "2003-01-14T10:22:00",
+      "deleted_at": null
+    }
+  ],
+  "claims": [
+    {
+      "id": "c1",
+      "type": "SUPPORTS",
+      "subject_id": "e_justin_1",
+      "object_id": "e_sslv3_dec",
+      "text": "Justin Erenkrantz supports deprecating SSLv3, casts +1 vote",
+      "confidence": 0.9,
+      "valid_from": "2003-01-14T10:22:00",
+      "valid_to": null,
+      "support_count": 1,
+      "schema_version": "1.0.0"
+    },
+    {
+      "id": "c2",
+      "type": "SUPPORTS",
+      "subject_id": "e_greg_1",
+      "object_id": "e_sslv3_dec",
+      "text": "Greg Stein supports deprecating SSLv3 (+1 vote)",
+      "confidence": 0.88,
+      "valid_from": "2003-01-14T12:05:00",
+      "valid_to": null,
+      "support_count": 1,
+      "schema_version": "1.0.0"
+    },
+    {
+      "id": "c3",
+      "type": "OPPOSES",
+      "subject_id": "e_william_1",
+      "object_id": "e_sslv3_dec",
+      "text": "William Rowe opposes immediate removal; proposes staged 2-release deprecation warning",
+      "confidence": 0.85,
+      "valid_from": "2003-01-14T14:30:00",
+      "valid_to": "2003-01-15T09:00:00",
+      "support_count": 1,
+      "schema_version": "1.0.0"
+    },
+    {
+      "id": "c4",
+      "type": "DECIDED",
+      "subject_id": "e_justin_1",
+      "object_id": "e_sslv3_dec",
+      "text": "RESOLVED: deprecate SSLv3 in 2.4, remove in 2.6 — vote +2/-0/abstain 0",
+      "confidence": 0.95,
+      "valid_from": "2003-01-15T09:00:00",
+      "valid_to": null,
+      "support_count": 3,
+      "schema_version": "1.0.0"
+    },
+    {
+      "id": "c5",
+      "type": "ASSIGNED",
+      "subject_id": "e_justin_1",
+      "object_id": "e_bz12301",
+      "text": "BZ-12301 (mod_ssl segfault on renegotiation) assigned to Justin Erenkrantz",
+      "confidence": 0.9,
+      "valid_from": "2003-01-16T08:45:00",
+      "valid_to": null,
+      "support_count": 2,
+      "schema_version": "1.0.0"
+    },
+    {
+      "id": "c6",
+      "type": "MENTIONS",
+      "subject_id": "e_justin_1",
+      "object_id": "e_bz12288",
+      "text": "Justin mentions BZ-12288 as sharing the same renegotiation code path as BZ-12301",
+      "confidence": 0.8,
+      "valid_from": "2003-01-17T11:00:00",
+      "valid_to": null,
+      "support_count": 1,
+      "schema_version": "1.0.0"
+    },
+    {
+      "id": "c7",
+      "type": "SUPPORTS",
+      "subject_id": "e_justin_1",
+      "object_id": "e_mpm_dec",
+      "text": "Justin supports raising ThreadsPerChild to 64, citing BZ-12310 benchmark data",
+      "confidence": 0.85,
+      "valid_from": "2003-01-18T16:00:00",
+      "valid_to": null,
+      "support_count": 1,
+      "schema_version": "1.0.0"
+    },
+    {
+      "id": "c8",
+      "type": "DECIDED",
+      "subject_id": "e_greg_1",
+      "object_id": "e_mpm_dec",
+      "text": "Greg Stein proposes raising worker MPM ThreadsPerChild default from 25 to 64",
+      "confidence": 0.88,
+      "valid_from": "2003-01-18T15:30:00",
+      "valid_to": null,
+      "support_count": 2,
+      "schema_version": "1.0.0"
+    },
+    {
+      "id": "c9",
+      "type": "MENTIONS",
+      "subject_id": "e_sslv3_dec",
+      "object_id": "e_modssl",
+      "text": "SSLv3 deprecation decision affects mod_ssl component",
+      "confidence": 0.9,
+      "valid_from": "2003-01-14T10:22:00",
+      "valid_to": null,
+      "support_count": 2,
+      "schema_version": "1.0.0"
+    },
+    {
+      "id": "c10",
+      "type": "MENTIONS",
+      "subject_id": "e_mpm_dec",
+      "object_id": "e_worker_mpm",
+      "text": "ThreadsPerChild decision targets the worker MPM component",
+      "confidence": 0.9,
+      "valid_from": "2003-01-18T15:30:00",
+      "valid_to": null,
+      "support_count": 1,
+      "schema_version": "1.0.0"
+    },
+    {
+      "id": "c11",
+      "type": "DEPENDS_ON",
+      "subject_id": "e_bz12301",
+      "object_id": "e_bz12288",
+      "text": "BZ-12301 and BZ-12288 share the same renegotiation code path",
+      "confidence": 0.75,
+      "valid_from": "2003-01-17T11:00:00",
+      "valid_to": null,
+      "support_count": 1,
+      "schema_version": "1.0.0"
+    },
+    {
+      "id": "c12",
+      "type": "MENTIONS",
+      "subject_id": "e_sslv3_dec",
+      "object_id": "e_sslv3_concept",
+      "text": "Decision targets SSLv3 protocol (vulnerable to POODLE)",
+      "confidence": 0.95,
+      "valid_from": "2003-01-14T10:22:00",
+      "valid_to": null,
+      "support_count": 1,
+      "schema_version": "1.0.0"
+    }
+  ],
+  "evidence": [
+    {
+      "id": "ev1",
+      "claim_id": "c1",
+      "source_id": "7f4a2b...",
+      "message_id": "<001@httpd.apache.org>",
+      "excerpt": "I propose we remove SSLv3 support from mod_ssl entirely.\nIt is obsolete and CVE-2014-3566 (POODLE) demonstrates why.\nCasting my vote: +1",
+      "char_start": 0,
+      "char_end": 130,
+      "timestamp": "2003-01-14T10:22:00",
+      "extraction_version": "claude-haiku-4-5-20251001:1.0.0:abc123"
+    },
+    {
+      "id": "ev2",
+      "claim_id": "c2",
+      "source_id": "9c1d3e...",
+      "message_id": "<002@httpd.apache.org>",
+      "excerpt": "+1 from me as well. Long overdue.",
+      "char_start": 62,
+      "char_end": 95,
+      "timestamp": "2003-01-14T12:05:00",
+      "extraction_version": "claude-haiku-4-5-20251001:1.0.0:abc123"
+    },
+    {
+      "id": "ev3",
+      "claim_id": "c3",
+      "source_id": "2a8f5c...",
+      "message_id": "<003@httpd.apache.org>",
+      "excerpt": "-1 for now. Some enterprise customers still require SSLv3.\nWe should deprecate first with a 2-release warning, not remove.",
+      "char_start": 0,
+      "char_end": 118,
+      "timestamp": "2003-01-14T14:30:00",
+      "extraction_version": "claude-haiku-4-5-20251001:1.0.0:abc123"
+    },
+    {
+      "id": "ev4",
+      "claim_id": "c4",
+      "source_id": "3b7e9d...",
+      "message_id": "<004@httpd.apache.org>",
+      "excerpt": "RESOLVED: deprecate SSLv3 in 2.4, remove in 2.6. Vote: +2, -0, abstain 0.",
+      "char_start": 59,
+      "char_end": 132,
+      "timestamp": "2003-01-15T09:00:00",
+      "extraction_version": "claude-haiku-4-5-20251001:1.0.0:abc123"
+    },
+    {
+      "id": "ev5a",
+      "claim_id": "c5",
+      "source_id": "4c0f1a...",
+      "message_id": "<005@httpd.apache.org>",
+      "excerpt": "Bug BZ-12301 (mod_ssl segfault on renegotiation) has been assigned to Justin.",
+      "char_start": 0,
+      "char_end": 75,
+      "timestamp": "2003-01-16T08:45:00",
+      "extraction_version": "claude-haiku-4-5-20251001:1.0.0:abc123"
+    },
+    {
+      "id": "ev5b",
+      "claim_id": "c5",
+      "source_id": "5d2g3b...",
+      "message_id": "<006@httpd.apache.org>",
+      "excerpt": "Confirmed. I'll look at BZ-12301 this week.\nAlso related: BZ-12288 (same renegotiation path).",
+      "char_start": 0,
+      "char_end": 93,
+      "timestamp": "2003-01-17T11:00:00",
+      "extraction_version": "claude-haiku-4-5-20251001:1.0.0:abc123"
+    },
+    {
+      "id": "ev7",
+      "claim_id": "c7",
+      "source_id": "8h5j4k...",
+      "message_id": "<008@httpd.apache.org>",
+      "excerpt": "+1. Benchmark data supports this. See BZ-12310.",
+      "char_start": 0,
+      "char_end": 47,
+      "timestamp": "2003-01-18T16:00:00",
+      "extraction_version": "claude-haiku-4-5-20251001:1.0.0:abc123"
+    },
+    {
+      "id": "ev8",
+      "claim_id": "c8",
+      "source_id": "7g4i3j...",
+      "message_id": "<007@httpd.apache.org>",
+      "excerpt": "Current default is 25. Modern hardware easily handles 64.\nThis would affect httpd-worker MPM component.\nVote: +1",
+      "char_start": 0,
+      "char_end": 110,
+      "timestamp": "2003-01-18T15:30:00",
+      "extraction_version": "claude-haiku-4-5-20251001:1.0.0:abc123"
+    }
+  ],
+  "merge_log": [
+    {
+      "id": "ml1",
+      "source_id": "e_justin_alt",
+      "target_id": "e_justin_1",
+      "entity_type": "Person",
+      "reason": "email_alias_cluster (justin@erenkrantz.com → jerenkrantz@apache.org via canonical_overrides.json)",
+      "merged_at": "2003-01-17T11:00:00",
+      "merged_by": "pipeline_canonicalizer",
+      "undone_at": null
+    },
+    {
+      "id": "ml2",
+      "source_id": "e_greg_alt",
+      "target_id": "e_greg_1",
+      "entity_type": "Person",
+      "reason": "username_name_cluster (gstein@google.com username 'gstein' matches gstein@apache.org, name similarity 1.0)",
+      "merged_at": "2003-01-18T15:30:00",
+      "merged_by": "pipeline_canonicalizer",
+      "undone_at": null
+    }
+  ],
+  "conflicts": [
+    {
+      "id": "cf1",
+      "claim_a_id": "c3",
+      "claim_b_id": "c4",
+      "resolution": "b_wins",
+      "resolved_at": "2003-01-15T09:00:00",
+      "detected_at": "2003-01-15T09:00:00",
+      "_note": "William's -1 opposition (c3) was resolved by Justin's amended RESOLVED (c4). c3.valid_to set = 2003-01-15."
+    }
+  ]
+}
